@@ -120,6 +120,7 @@ export default function Home() {
                 {filteredData.map((ad: AdSpot) => (
                   <AdCard
                     key={ad.id}
+                    id={ad.id}
                     title={ad.title}
                     imageUrl={ad.imageUrl ?? '/file.svg'}
                     status={ad.status}

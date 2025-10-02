@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { AdSpot, AdPlacement, AdStatus } from '../../../types/adSpot';
 
-// In-memory store for AdSpots. This will be reset when the server restarts.
-const adSpots: AdSpot[] = [];
+export const adSpots: AdSpot[] = [];
 
 const allowedPlacements: AdPlacement[] = [
   'banner',
