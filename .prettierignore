@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+build
+public
+*.min.js
+*.bundle.js
+dist
+coverage
