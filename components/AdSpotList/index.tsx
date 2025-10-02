@@ -2,9 +2,24 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import AdCard from '../AdCard/index';
 import type { AdPlacement, AdSpot } from '../../types/adSpot';
 import styles from './styles.module.css';
+
+const fetchAdSpots = async (): Promise<AdSpot[]> => {
+  const res = await fetch('/api/adspots', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ad spots: ${res.status}`);
+  }
+
+  return res.json();
+};
 
 const placements: AdPlacement[] = [
   'banner',
@@ -17,13 +32,24 @@ const placements: AdPlacement[] = [
 ];
 
 interface AdSpotListProps {
-  adSpots: AdSpot[];
+  initialAdSpots?: AdSpot[];
 }
 
-export default function AdSpotList({ adSpots }: AdSpotListProps) {
+export default function AdSpotList({ initialAdSpots = [] }: AdSpotListProps) {
   const router = useRouter();
   const [selectedPlacement, setSelectedPlacement] = useState<AdPlacement | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Use React Query to fetch and cache ad spots
+  const {
+    data: adSpots = initialAdSpots,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ['adspots'],
+    queryFn: fetchAdSpots,
+    initialData: initialAdSpots,
+  });
 
   // Filter ads by placement and search query
   const filteredData = adSpots.filter((ad) => {
@@ -99,56 +125,69 @@ export default function AdSpotList({ adSpots }: AdSpotListProps) {
           </div>
         </div>
 
-        {Array.isArray(filteredData) && (
-          <>
-            {filteredData.length === 0 ? (
-              <div className={styles.emptyState}>
-                <span className={`material-icons ${styles.emptyIcon}`}>
-                  {searchQuery || selectedPlacement !== 'all' ? 'search_off' : 'inventory_2'}
-                </span>
-                <h2 className={styles.emptyTitle}>
-                  {adSpots.length > 0 ? 'No ads found' : 'No ad spots yet'}
-                </h2>
-                <p className={styles.emptyDescription}>
-                  {adSpots.length > 0
-                    ? searchQuery
-                      ? `No ads match "${searchQuery}"`
-                      : `No ads found for ${selectedPlacement} placement`
-                    : 'Create your first ad spot to get started'}
-                </p>
-                {adSpots.length === 0 ? (
-                  <button onClick={handleCreateNew} className={styles.emptyButton}>
-                    <span className="material-icons">add</span>
-                    <span>Create Ad Spot</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setSelectedPlacement('all');
-                    }}
-                    className={styles.emptyButton}
-                  >
-                    <span className="material-icons">refresh</span>
-                    <span>Clear Filters</span>
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className={styles.grid}>
-                {filteredData.map((ad: AdSpot) => (
-                  <AdCard
-                    key={ad.id}
-                    id={ad.id}
-                    title={ad.title}
-                    imageUrl={ad.imageUrl ?? '/file.svg'}
-                    status={ad.status}
-                    placement={ad.placement}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+        {isLoading ? (
+          <div className={styles.emptyState}>
+            <span className={`material-icons ${styles.emptyIcon}`}>hourglass_empty</span>
+            <h2 className={styles.emptyTitle}>Loading ad spots...</h2>
+          </div>
+        ) : isError ? (
+          <div className={styles.emptyState}>
+            <span className={`material-icons ${styles.emptyIcon}`}>error_outline</span>
+            <h2 className={styles.emptyTitle}>Failed to load ad spots</h2>
+            <p className={styles.emptyDescription}>Please try refreshing the page</p>
+          </div>
+        ) : (
+          Array.isArray(filteredData) && (
+            <>
+              {filteredData.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <span className={`material-icons ${styles.emptyIcon}`}>
+                    {searchQuery || selectedPlacement !== 'all' ? 'search_off' : 'inventory_2'}
+                  </span>
+                  <h2 className={styles.emptyTitle}>
+                    {adSpots.length > 0 ? 'No ads found' : 'No ad spots yet'}
+                  </h2>
+                  <p className={styles.emptyDescription}>
+                    {adSpots.length > 0
+                      ? searchQuery
+                        ? `No ads match "${searchQuery}"`
+                        : `No ads found for ${selectedPlacement} placement`
+                      : 'Create your first ad spot to get started'}
+                  </p>
+                  {adSpots.length === 0 ? (
+                    <button onClick={handleCreateNew} className={styles.emptyButton}>
+                      <span className="material-icons">add</span>
+                      <span>Create Ad Spot</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSelectedPlacement('all');
+                      }}
+                      className={styles.emptyButton}
+                    >
+                      <span className="material-icons">refresh</span>
+                      <span>Clear Filters</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className={styles.grid}>
+                  {filteredData.map((ad: AdSpot) => (
+                    <AdCard
+                      key={ad.id}
+                      id={ad.id}
+                      title={ad.title}
+                      imageUrl={ad.imageUrl ?? '/file.svg'}
+                      status={ad.status}
+                      placement={ad.placement}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )
         )}
       </div>
     </main>

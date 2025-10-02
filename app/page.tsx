@@ -28,5 +28,5 @@ async function fetchAdSpots(): Promise<AdSpot[]> {
 export default async function Home() {
   const adSpots = await fetchAdSpots();
 
-  return <AdSpotList adSpots={adSpots} />;
+  return <AdSpotList initialAdSpots={adSpots} />;
 }

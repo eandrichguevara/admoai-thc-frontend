@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { AdPlacement, AdStatus } from '../../types/adSpot';
+import type { AdPlacement, AdStatus, AdSpot } from '../../types/adSpot';
 import styles from './styles.module.css';
 
 export interface AdCardProps {
@@ -35,8 +35,28 @@ export function AdCard({ id, title, imageUrl, status, placement }: AdCardProps) 
 
   const mutation = useMutation({
     mutationFn: updateAdStatus,
-    onSuccess: () => {
-      // Invalidate and refetch the adspots query
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ['adspots'] });
+
+      const previousAdSpots = queryClient.getQueryData(['adspots']);
+
+      queryClient.setQueryData<AdSpot[]>(['adspots'], (old) => {
+        if (!old) return old;
+
+        return old.map((ad) => (ad.id === variables.id ? { ...ad, status: variables.status } : ad));
+      });
+
+      return { previousAdSpots };
+    },
+    // On error, rollback to the previous value
+    onError: (err, variables, context) => {
+      if (context?.previousAdSpots) {
+        queryClient.setQueryData(['adspots'], context.previousAdSpots);
+      }
+      console.error('Failed to update ad status:', err);
+    },
+
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['adspots'] });
     },
   });
@@ -45,7 +65,7 @@ export function AdCard({ id, title, imageUrl, status, placement }: AdCardProps) 
     .filter(Boolean)
     .join(' ');
 
-  // Usar el proxy de imágenes para cargar de forma segura
+  // Use the image proxy to upload securely
   const proxiedImageUrl = `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`;
 
   const handleToggle = () => {
@@ -72,13 +92,10 @@ export function AdCard({ id, title, imageUrl, status, placement }: AdCardProps) 
           <button
             className={`${styles.toggleButton} ${isActive ? styles.toggleActive : ''}`}
             onClick={handleToggle}
-            disabled={mutation.isPending}
             aria-label={isActive ? 'Deactivate ad' : 'Activate ad'}
             title={isActive ? 'Click to deactivate' : 'Click to activate'}
           >
-            <span className="material-icons">
-              {mutation.isPending ? 'sync' : isActive ? 'toggle_on' : 'toggle_off'}
-            </span>
+            <span className="material-icons">{isActive ? 'toggle_on' : 'toggle_off'}</span>
           </button>
         </div>
         <div className={styles.metadata}>
