@@ -3,9 +3,14 @@ import type { AdSpot } from '../types/adSpot';
 
 async function fetchAdSpots(): Promise<AdSpot[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+
     const res = await fetch(`${baseUrl}/api/adspots`, {
       cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!res.ok) {
