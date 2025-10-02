@@ -1,15 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
-import type { AdStatus } from '../../types/adSpot';
+import type { AdPlacement, AdStatus } from '../../types/adSpot';
 import styles from './styles.module.css';
 
 export interface AdCardProps {
   title: string;
   imageUrl: string;
   status: AdStatus;
+  placement: AdPlacement;
 }
 
-export function AdCard({ title, imageUrl, status }: AdCardProps) {
+export function AdCard({ title, imageUrl, status, placement }: AdCardProps) {
   const statusDotClass = [styles.statusDot, styles[status as keyof typeof styles]]
     .filter(Boolean)
     .join(' ');
@@ -30,9 +31,15 @@ export function AdCard({ title, imageUrl, status }: AdCardProps) {
       </div>
       <div className={styles.body}>
         <h3 className={styles.title}>{title}</h3>
-        <div className={styles.statusRow}>
-          <span className={statusDotClass} />
-          <small className={styles.statusText}>{status}</small>
+        <div className={styles.metadata}>
+          <div className={styles.placementBadge}>
+            <span className="material-icons">place</span>
+            <span>{placement}</span>
+          </div>
+          <div className={styles.statusRow}>
+            <span className={statusDotClass} />
+            <small className={styles.statusText}>{status}</small>
+          </div>
         </div>
       </div>
     </article>

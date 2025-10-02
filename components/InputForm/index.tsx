@@ -7,6 +7,7 @@ interface BaseInputFormProps {
   name?: string;
   error?: FieldError;
   required?: boolean;
+  icon?: string;
 }
 
 type InputFormProps = BaseInputFormProps &
@@ -25,6 +26,7 @@ export default function InputForm({
   name,
   error,
   required = false,
+  icon,
   type = 'text',
   ...props
 }: InputFormProps) {
@@ -33,7 +35,10 @@ export default function InputForm({
   return (
     <div className={styles.field}>
       <label htmlFor={inputId} className={styles.label}>
-        {label} {required && '*'}
+        {icon && <span className="material-icons">{icon}</span>}
+        <span>
+          {label} {required && <span className={styles.required}>*</span>}
+        </span>
       </label>
 
       {type === 'select' && 'options' in props ? (
@@ -59,7 +64,12 @@ export default function InputForm({
         />
       )}
 
-      {error && <span className={styles.fieldError}>{error.message}</span>}
+      {error && (
+        <span className={styles.fieldError}>
+          <span className="material-icons">error</span>
+          {error.message}
+        </span>
+      )}
     </div>
   );
 }

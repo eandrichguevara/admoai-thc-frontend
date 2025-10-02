@@ -83,62 +83,73 @@ export default function AdSpotForm({ onSuccess, onCancel }: AdSpotFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      <InputForm
-        label="Title"
-        type="text"
-        required
-        error={errors.title}
-        {...register('title', {
-          required: 'Title is required',
-          validate: (value) => {
-            if (!value || value.trim().length === 0) {
-              return 'Title cannot be empty';
-            }
-            return true;
-          },
-        })}
-      />
+      <div className={styles.formContent}>
+        <InputForm
+          label="Title"
+          type="text"
+          required
+          icon="title"
+          error={errors.title}
+          {...register('title', {
+            required: 'Title is required',
+            validate: (value) => {
+              if (!value || value.trim().length === 0) {
+                return 'Title cannot be empty';
+              }
+              return true;
+            },
+          })}
+        />
 
-      <InputForm
-        label="Image URL"
-        type="text"
-        required
-        error={errors.imageUrl}
-        {...register('imageUrl', {
-          required: 'Image URL is required',
-          validate: (value) => {
-            if (!value || value.trim().length === 0) {
-              return 'Image URL cannot be empty';
-            }
-            return true;
-          },
-        })}
-      />
+        <InputForm
+          label="Image URL"
+          type="text"
+          required
+          icon="image"
+          error={errors.imageUrl}
+          {...register('imageUrl', {
+            required: 'Image URL is required',
+            validate: (value) => {
+              if (!value || value.trim().length === 0) {
+                return 'Image URL cannot be empty';
+              }
+              return true;
+            },
+          })}
+        />
 
-      <InputForm
-        label="Placement"
-        type="select"
-        error={errors.placement}
-        options={allowedPlacements.map((p) => ({ value: p, label: p }))}
-        {...register('placement')}
-      />
+        <InputForm
+          label="Placement"
+          type="select"
+          icon="location_on"
+          error={errors.placement}
+          options={allowedPlacements.map((p) => ({ value: p, label: p }))}
+          {...register('placement')}
+        />
 
-      <InputForm
-        label="TTL Minutes (optional)"
-        type="number"
-        placeholder="e.g., 60"
-        error={errors.ttlMinutes}
-        {...register('ttlMinutes', {
-          valueAsNumber: true,
-          min: { value: 1, message: 'TTL must be at least 1 minute' },
-        })}
-      />
+        <InputForm
+          label="TTL Minutes (optional)"
+          type="number"
+          placeholder="e.g., 60"
+          icon="schedule"
+          error={errors.ttlMinutes}
+          {...register('ttlMinutes', {
+            valueAsNumber: true,
+            min: { value: 1, message: 'TTL must be at least 1 minute' },
+          })}
+        />
 
-      {mutation.error && (
-        <div className={styles.error}>
-          {mutation.error instanceof Error ? mutation.error.message : 'Failed to create ad spot'}
-        </div>
-      )}
+        {mutation.error && (
+          <div className={styles.error}>
+            <span className="material-icons">error_outline</span>
+            <span>
+              {mutation.error instanceof Error
+                ? mutation.error.message
+                : 'Failed to create ad spot'}
+            </span>
+          </div>
+        )}
+      </div>
 
       <div className={styles.actions}>
         {onCancel && (
@@ -148,11 +159,15 @@ export default function AdSpotForm({ onSuccess, onCancel }: AdSpotFormProps) {
             className={styles.buttonSecondary}
             disabled={mutation.isPending}
           >
-            Cancel
+            <span className="material-icons">close</span>
+            <span>Cancel</span>
           </button>
         )}
         <button type="submit" className={styles.buttonPrimary} disabled={mutation.isPending}>
-          {mutation.isPending ? 'Creating...' : 'Create Ad Spot'}
+          <span className="material-icons">
+            {mutation.isPending ? 'hourglass_empty' : 'check_circle'}
+          </span>
+          <span>{mutation.isPending ? 'Creating...' : 'Create Ad Spot'}</span>
         </button>
       </div>
     </form>

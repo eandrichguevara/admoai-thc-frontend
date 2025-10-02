@@ -18,7 +18,15 @@ export default function CreateAdSpotPage() {
   return (
     <main className={styles.container}>
       <div className={styles.formWrapper}>
-        <h1 className={styles.heading}>Create New Ad Spot</h1>
+        <div className={styles.header}>
+          <button onClick={handleCancel} className={styles.backButton}>
+            <span className="material-icons">arrow_back</span>
+          </button>
+          <div className={styles.headerContent}>
+            <span className={`material-icons ${styles.headerIcon}`}>add_box</span>
+            <h1 className={styles.heading}>Create New Ad Spot</h1>
+          </div>
+        </div>
         <AdSpotForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </div>
     </main>

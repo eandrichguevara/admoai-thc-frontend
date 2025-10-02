@@ -26,8 +26,35 @@
 }
 
 .title {
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.metadata {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.placementBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+  text-transform: capitalize;
+}
+
+.placementBadge .material-icons {
+  font-size: 14px;
+  color: #6b7280;
 }
 
 .statusRow {
@@ -44,10 +71,23 @@
   background: #6b7280; /* fallback */
 }
 
-.statusDot.active { background: #16a34a; }
-.statusDot.paused { background: #f59e0b; }
-.statusDot.deactivated { background: #ef4444; }
-.statusDot.pending { background: #6366f1; }
-.statusDot.scheduled { background: #0284c7; }
+.statusDot.active {
+  background: #16a34a;
+}
+.statusDot.paused {
+  background: #f59e0b;
+}
+.statusDot.deactivated {
+  background: #ef4444;
+}
+.statusDot.pending {
+  background: #6366f1;
+}
+.statusDot.scheduled {
+  background: #0284c7;
+}
 
-.statusText { color: #374151; text-transform: capitalize; }
+.statusText {
+  color: #374151;
+  text-transform: capitalize;
+}
